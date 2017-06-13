@@ -1,4 +1,4 @@
-# CloudFormation template to create CodeDeploy resources
+### CloudFormation template to create CodeDeploy resources
 ==========================
 ### Resources created:
 ==========================
@@ -7,18 +7,19 @@
 **AWS::IAM::Role**
 **AWS::CodeDeploy::Application**
 ==========================
-## CloudFormation with a Lambda function CustomResouce to update CodeDeploy deployment Group configuration: 
+### CloudFormation with a Lambda function CustomResouce to update CodeDeploy deployment Group configuration: 
 
 **1. Add Trigger**
+
 **2. Add Alarm**
 ==========================
 
-**Steps to follow**
+**Steps to follow:**
 
-### 1. Upload updateddeploymentgroup.zip to S3 bucket in AWS account
-### 2. Update codedeploy.json Ec2TagFilters to approriate Ec2Tags for instances that have been launched with the purpose of being used with CodeDeploy
-### 3. Launch codedeploy.json 
-### 4. codedeploy.json has the following parameters require input & understanding: 
+**1. Upload updateddeploymentgroup.zip to S3 bucket in AWS account**
+**2. Update codedeploy.json Ec2TagFilters to approriate Ec2Tags for instances that have been launched with the purpose of being used with CodeDeploy**
+**3. Launch codedeploy.json**
+**4. codedeploy.json has the following parameters require input & understanding:**
 
 **AlarmName -> CloudWatch alarm name to add**
 **AppName -> CodeDeploy Application Name**
