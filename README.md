@@ -14,6 +14,7 @@
 ### CloudFormation with a Lambda function CustomResouce to update CodeDeploy deployment Group configurations: 
 
 *1. Add Trigger
+
 *2. Add Alarm
 
 ==========================
@@ -26,6 +27,7 @@
 4. codedeploy.json has the following parameters require input & understanding:
 
 | Parameter | Detail|
+| ------ | ------ |
 | AlarmName | CloudWatch alarm name to add |
 | AppName | CodeDeploy Application Name| 
 | CodeDeployTriggerName | CodeDeploy trigger name |
