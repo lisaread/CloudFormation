@@ -9,8 +9,8 @@
 ==========================
 ## CloudFormation with a Lambda function CustomResouce to update CodeDeploy deployment Group configuration: 
 
-###1. Add Trigger
-###2. Add Alarm
+### 1. Add Trigger
+### 2. Add Alarm
 ==========================
 **Steps to follow**
 
