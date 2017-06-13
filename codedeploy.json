@@ -1,0 +1,164 @@
+{
+    "Parameters": {
+        "AppName": {
+            "Type": "String",
+            "Description": "Code Deploy ApplicationName"
+        },
+        "S3Bucket":{
+            "Type": "String",
+            "Description": "S3Bucket Name where your Code is uploaded",
+            "Default": "codebucketname"
+        },
+        "S3Key": {
+            "Type": "String",
+            "Description": "S3 Key for your application name",
+            "Default": "application.zip"
+        },
+        "SNSTopicARN": {
+            "Type": "String",
+            "Description": "Existing SNS Topic ARN"
+        },
+        "TriggerEventsArray":{
+            "Type": "CommaDelimitedList",
+            "Default": "DeploymentStart,DeploymentSuccess,DeploymentFailure",
+            "Description": "CodeDeploy Events for which you want to trigger notification"
+        },
+        "CodeDeployTriggerName": {
+            "Type": "String",
+            "Description": "Name for the CodeDeployTrigger"
+        },
+        "AlarmName": {
+            "Type": "String",
+            "Description": "Name for the CodeDeploy CloudWatch alarm"
+        },
+        "IgnorePollAlarmFailure": {
+            "Type": "String",
+            "AllowedValues": ["True", "False"],
+            "Default": "True",
+            "Description": "Optionally either Trure or False, specifies whether to continue on alarm failure or not"
+        },
+        "S3BucketName": {
+            "Type": "String",
+            "Description": "S3 BucketName to which the Lambda code has been uploaded"
+        },
+        "RoleArn":{
+            "Type": "String",
+            "Description": "Allows CodeDeploy to access other AWS services such as Auto Scaling on your behalf"
+        }
+    },
+    "Resources": {
+        "CustomResource": {
+            "Type": "Custom::ChangeCodeDeploy",
+            "Properties":{
+                "ServiceToken": {
+                    "Fn::GetAtt": [
+                        "LambdaFunction",
+                        "Arn"
+                    ]
+                },
+                "UpdateDeploymentGroup": { "Ref": "DeploymentGroup" },
+                "ApplicationName": { "Ref": "MyApplication" },
+                "DeploymentTriggerName": { "Ref": "CodeDeployTriggerName" },
+                "Alarms": { "Ref": "AlarmName" },
+                "IgnoreContinue": { "Ref": "IgnorePollAlarmFailure" },
+                "TargetArn": { "Ref": "SNSTopicARN" },
+                "EventsArray": { "Ref": "TriggerEventsArray" }
+            }
+        },
+        "LambdaFunction": {
+            "Properties": {
+                "Code": {
+                    "S3Bucket": { "Ref": "S3BucketName" },
+                    "S3Key": "updatedeploymentgroup.zip"
+                },
+                "Handler": "deploymentgroup.lambda_handler",
+                "Timeout": "300",
+                "Role": {
+                    "Fn::GetAtt": [
+                        "LambdaRole",
+                        "Arn"
+                    ]
+                },
+                "Runtime": "python2.7"
+            },
+            "Type": "AWS::Lambda::Function"
+        },
+        "LambdaRole": {
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Statement": [
+                        {
+                            "Action": [
+                                "sts:AssumeRole"
+                            ],
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": [
+                                    "lambda.amazonaws.com"
+                                ]
+                            }
+                        }
+                    ],
+                    "Version": "2012-10-17"
+                },
+                "Policies": [{
+                    "PolicyName": "root",
+                    "PolicyDocument": {
+                        "Version": "2012-10-17",
+                        "Statement": [{
+                            "Effect": "Allow",
+                            "Action": ["logs:CreateLogGroup","logs:CreateLogStream","logs:PutLogEvents"],
+                            "Resource": "arn:aws:logs:*:*:*"
+                        },
+                        {
+                            "Effect": "Allow",
+                            "Action": [
+                                "codedeploy:*"
+                            ],
+                            "Resource": "*"
+                        }]
+                    }
+                }]
+            },
+            "Type": "AWS::IAM::Role"
+        },
+        "MyApplication": {
+            "Type": "AWS::CodeDeploy::Application",
+            "Properties": {
+                "ApplicationName": { "Ref": "AppName" }
+            }
+        },
+        "DeploymentGroup": {
+            "Type": "AWS::CodeDeploy::DeploymentGroup",
+            "Properties": {
+                "ApplicationName": {
+                    "Ref": "MyApplication"
+                },
+                "Deployment": {
+                    "Description": "First time",
+                    "IgnoreApplicationStopFailures": "true",
+                    "Revision": {
+                        "RevisionType": "S3",
+                        "S3Location": {
+                            "Bucket": {
+                                "Ref": "S3Bucket"
+                            },
+                            "Key": {
+                                "Ref": "S3Key"
+                            },
+                            "BundleType": "Zip"
+                        }
+                    }
+                },
+                "Ec2TagFilters":[{
+                      "Key" : "cd-permanent",
+                      "Value" : "cd-permanent",
+                      "Type" : "KEY_AND_VALUE"
+                }],
+                "ServiceRoleArn": {
+                    "Ref": "RoleArn"
+                }
+            }
+        }
+    }
+}
