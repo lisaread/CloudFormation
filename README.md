@@ -25,7 +25,7 @@
 2. Update codedeploy.json Ec2TagFilters to approriate Ec2Tags for instances that have been launched with the purpose of being used with CodeDeploy
 3. Launch codedeploy.json
 4. codedeploy.json has the following parameters require input & understanding:
-```sh
++++++++++++++++++++++++
 AlarmName -> CloudWatch alarm name to add 
 AppName -> CodeDeploy Application Name  
 CodeDeployTriggerName -> CodeDeploy trigger name 
@@ -35,7 +35,7 @@ S3BucketName -> S3 bucket which has Lambda function code (updateddeploymentgroup
 S3Key -> S3 CodeDeploy application code
 SNSTopicARN -> SNS topic arn 
 TriggerEventsArray -> Events trigger 
-```
++++++++++++++++++++++++
 ```
 ==========================
 
